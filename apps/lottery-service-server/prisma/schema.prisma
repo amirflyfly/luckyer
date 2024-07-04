@@ -1,0 +1,78 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Lottery {
+  createdAt    DateTime      @default(now())
+  description  String?
+  endDate      DateTime?
+  id           String        @id @default(cuid())
+  organizer    Organizer?    @relation(fields: [organizerId], references: [id])
+  organizerId  String?
+  participants Participant[]
+  rewards      Reward[]
+  sharers      Sharer[]
+  startDate    DateTime?
+  title        String?
+  totalRewards Int?
+  updatedAt    DateTime      @updatedAt
+}
+
+model Reward {
+  createdAt   DateTime @default(now())
+  description String?
+  id          String   @id @default(cuid())
+  lottery     Lottery? @relation(fields: [lotteryId], references: [id])
+  lotteryId   String?
+  updatedAt   DateTime @updatedAt
+  winner      String?
+}
+
+model Participant {
+  createdAt DateTime @default(now())
+  email     String?
+  id        String   @id @default(cuid())
+  lottery   Lottery? @relation(fields: [lotteryId], references: [id])
+  lotteryId String?
+  name      String?
+  points    Int?
+  updatedAt DateTime @updatedAt
+}
+
+model ShareRecord {
+  createdAt          DateTime @default(now())
+  id                 String   @id @default(cuid())
+  participatingCount Int?
+  sharedWith         String?
+  sharer             Sharer?  @relation(fields: [sharerId], references: [id])
+  sharerId           String?
+  successfulShare    Boolean?
+  updatedAt          DateTime @updatedAt
+}
+
+model Sharer {
+  createdAt    DateTime      @default(now())
+  email        String?
+  id           String        @id @default(cuid())
+  lottery      Lottery?      @relation(fields: [lotteryId], references: [id])
+  lotteryId    String?
+  name         String?
+  points       Int?
+  shareRecords ShareRecord[]
+  updatedAt    DateTime      @updatedAt
+}
+
+model Organizer {
+  createdAt DateTime  @default(now())
+  email     String?
+  id        String    @id @default(cuid())
+  lotteries Lottery[]
+  name      String?
+  points    Int?
+  updatedAt DateTime  @updatedAt
+}
